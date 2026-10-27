@@ -1,0 +1,21 @@
+{
+  "name": "whatsapp-gateway",
+  "version": "1.0.0",
+  "description": "WhatsApp Gateway 1 device (Baileys) + dashboard + API untuk notifikasi pesanan",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@whiskeysockets/baileys": "^6.7.18",
+    "express": "^4.21.2",
+    "pg": "^8.23.1",
+    "pino": "^9.6.0",
+    "qrcode": "^1.5.4"
+  }
+}

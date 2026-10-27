@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WA Gateway</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Login -->
+  <div class="login hidden" id="login">
+    <form class="card" id="login-form">
+      <div class="logo">WA <span>Gateway</span></div>
+      <p class="sub" style="margin:0 0 20px">Masuk untuk mengelola WhatsApp Anda</p>
+      <div class="field"><label for="password">Password</label><input id="password" type="password" autocomplete="current-password" required></div>
+      <div class="err" id="login-err"></div>
+      <button class="btn" style="width:100%;justify-content:center">Masuk</button>
+    </form>
+  </div>
+
+  <!-- App -->
+  <div class="app hidden" id="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="logo">WA <span>Gateway</span></div>
+      <div class="tagline">1 device · Baileys</div>
+      <div class="nav">
+        <div class="group-label">Utama</div>
+        <button data-page="dashboard" class="active"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>Dashboard</button>
+        <button data-page="send"><svg class="i" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>Kirim Pesan</button>
+        <button data-page="history"><svg class="i" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>Riwayat</button>
+        <button data-page="inbox"><svg class="i" viewBox="0 0 24 24"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>Inbox</button>
+        <div class="group-label">Integrasi</div>
+        <button data-page="api"><svg class="i" viewBox="0 0 24 24"><path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/></svg>API &amp; Token</button>
+      </div>
+      <div class="side-foot">
+        <div class="avatar" id="avatar">WA</div>
+        <div style="flex:1;min-width:0"><b id="side-name">—</b><small id="side-number">belum terhubung</small></div>
+        <button class="btn outline sm" id="logout-btn" title="Keluar">Keluar</button>
+      </div>
+    </aside>
+
+    <main>
+      <div class="topbar">
+        <div style="display:flex;gap:12px;align-items:center">
+          <button class="btn outline sm menu-btn" id="menu-btn">☰</button>
+          <div><h1 id="page-title">Dashboard</h1><p id="greeting"></p></div>
+        </div>
+        <span class="pill warn" id="status-pill">Memuat…</span>
+      </div>
+
+      <!-- Dashboard -->
+      <section data-section="dashboard">
+        <div class="grid">
+          <div class="card stat"><div class="ibox"><svg class="i" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg></div><div class="val" id="s-today">—</div><div class="lbl">Pesan hari ini</div></div>
+          <div class="card stat"><div class="ibox" style="color:var(--success)"><svg class="i" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div><div class="val" id="s-sent">—</div><div class="lbl">Terkirim</div></div>
+          <div class="card stat"><div class="ibox" style="color:var(--warning)"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div><div class="val" id="s-pending">—</div><div class="lbl">Antrian</div></div>
+          <div class="card stat"><div class="ibox" style="color:var(--destructive)"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/></svg></div><div class="val" id="s-failed">—</div><div class="lbl">Gagal</div></div>
+        </div>
+        <div class="card">
+          <div class="card-head">
+            <svg class="i" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg>
+            <h2>Device</h2><div class="spacer"></div>
+            <button class="btn danger sm hidden" id="disconnect-btn">Disconnect</button>
+          </div>
+          <div class="device" id="device-box"></div>
+        </div>
+      </section>
+
+      <!-- Kirim -->
+      <section data-section="send" class="hidden">
+        <form class="card" id="send-form" style="max-width:680px">
+          <div class="card-head"><svg class="i" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg><h2>Kirim Pesan</h2></div>
+          <div class="field"><label for="f-target">Nomor tujuan</label><input id="f-target" placeholder="08123456789, 628987654321" required><div class="hint">Pisahkan dengan koma untuk banyak nomor. Format 08 otomatis diubah ke 62.</div></div>
+          <div class="field"><label for="f-message">Pesan</label><textarea id="f-message" placeholder="Tulis pesan…"></textarea><div class="hint">Format WA: *tebal*, _miring_, ~coret~</div></div>
+          <div class="field"><label for="f-url">URL lampiran (opsional)</label><input id="f-url" placeholder="https://contoh.com/invoice.pdf"><div class="hint">Gambar (jpg/png), video (mp4), atau dokumen.</div></div>
+          <button class="btn">Kirim →</button>
+        </form>
+      </section>
+
+      <!-- Riwayat -->
+      <section data-section="history" class="hidden">
+        <div class="card">
+          <div class="card-head"><svg class="i" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg><h2>Riwayat Pesan</h2><div class="spacer"></div>
+            <input id="h-search" placeholder="Cari nomor / pesan…" style="max-width:240px"></div>
+          <div class="table-wrap"><table><thead><tr><th>ID</th><th>Waktu</th><th>Tujuan</th><th>Pesan</th><th>Sumber</th><th>Status</th><th></th></tr></thead><tbody id="h-body"></tbody></table></div>
+        </div>
+      </section>
+
+      <!-- Inbox -->
+      <section data-section="inbox" class="hidden">
+        <div class="card">
+          <div class="card-head"><svg class="i" viewBox="0 0 24 24"><path d="M22 12h-6l-2 3h-4l-2-3H2"/></svg><h2>Pesan Masuk</h2></div>
+          <div class="table-wrap"><table><thead><tr><th>Waktu</th><th>Pengirim</th><th>Nama</th><th>Pesan</th></tr></thead><tbody id="i-body"></tbody></table></div>
+        </div>
+      </section>
+
+      <!-- API -->
+      <section data-section="api" class="hidden">
+        <div class="card">
+          <div class="card-head"><svg class="i" viewBox="0 0 24 24"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6M15.5 7.5l3 3L22 7l-3-3"/></svg><h2>Token API</h2></div>
+          <div class="token-box"><input id="token" type="password" readonly><button class="btn outline" id="show-token">Lihat</button><button class="btn outline" id="copy-token">Salin</button></div>
+          <p class="hint">Ubah token, whitelist IP, dan webhook di file <code>.env</code>, lalu restart server.</p>
+          <p class="sub">Whitelist IP: <b id="wl">—</b> · Webhook: <b id="wh">—</b></p>
+        </div>
+        <div class="card">
+          <div class="card-head"><svg class="i" viewBox="0 0 24 24"><path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/></svg><h2>Kirim pesan dari web e-commerce</h2></div>
+          <p class="sub"><code>POST <span class="base"></span>/api/send</code> · header <code>Authorization: TOKEN</code> · body JSON <code>target</code>, <code>message</code>, <code>url</code> (opsional)</p>
+          <b>PHP</b>
+<pre><code>$ch = curl_init('<span class="base"></span>/api/send');
+curl_setopt_array($ch, [
+  CURLOPT_POST =&gt; true,
+  CURLOPT_RETURNTRANSFER =&gt; true,
+  CURLOPT_TIMEOUT =&gt; 5,
+  CURLOPT_HTTPHEADER =&gt; ['Authorization: TOKEN_ANDA', 'Content-Type: application/json'],
+  CURLOPT_POSTFIELDS =&gt; json_encode([
+    'target'  =&gt; $order-&gt;no_hp,
+    'message' =&gt; "Halo {$order-&gt;nama}, pesanan #{$order-&gt;id} sudah kami terima. Total: Rp {$order-&gt;total}",
+  ]),
+]);
+$res = curl_exec($ch); // jangan sampai error WA menggagalkan checkout
+curl_close($ch);</code></pre>
+          <b style="display:block;margin-top:14px">JavaScript</b>
+<pre><code>await fetch('<span class="base"></span>/api/send', {
+  method: 'POST',
+  headers: { Authorization: 'TOKEN_ANDA', 'Content-Type': 'application/json' },
+  body: JSON.stringify({ target: '08123456789', message: 'Pesanan Anda sudah dikirim 🚚' })
+});</code></pre>
+          <b style="display:block;margin-top:14px">Endpoint lain</b>
+<pre><code>GET <span class="base"></span>/api/status         → status koneksi WA
+GET <span class="base"></span>/api/message/{id}   → status pesan (pending / sent / failed)</code></pre>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="app.js"></script>
+</body>
+</html>

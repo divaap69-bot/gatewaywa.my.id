@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+
+# Secret
+.env
+.env.*
+!.env.example
+
+# Sesi WhatsApp & data lokal
+storage/
+auth/
+data/
+*.db
+*.sqlite
+
+# Log
+logs/
+*.log
+npm-debug.log*
+
+# Build / tooling
+dist/
+build/
+coverage/
+.claude/
+.DS_Store
+Thumbs.db
