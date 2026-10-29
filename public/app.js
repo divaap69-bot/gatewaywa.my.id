@@ -42,7 +42,10 @@ document.querySelectorAll('.nav button').forEach((b) => b.onclick = () => {
 });
 
 // ---------- Dashboard ----------
-const statusPill = { connected: ['ok', 'Terhubung'], qr: ['warn', 'Menunggu scan QR'], connecting: ['warn', 'Menghubungkan…'], disconnected: ['bad', 'Terputus'] };
+const statusPill = {
+  connected: ['ok', 'Terhubung'], qr: ['warn', 'Menunggu scan QR'], connecting: ['warn', 'Menghubungkan…'], disconnected: ['bad', 'Terputus'],
+  replaced: ['bad', 'Sesi dipakai di tempat lain'], forbidden: ['bad', 'Ditolak WhatsApp'],
+};
 
 async function loadState() {
   const s = await api('/dash/state');

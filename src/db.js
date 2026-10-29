@@ -1,11 +1,23 @@
 import pg from 'pg';
+import { readFileSync } from 'node:fs';
 import { config } from './config.js';
+
+// SSL: verifikasi sertifikat kalau CA Supabase tersedia (DATABASE_CA_CERT), selain itu terenkripsi tanpa verifikasi
+function sslOptions() {
+  if (!config.databaseSsl) return false;
+  if (config.databaseCaCert) return { ca: readFileSync(config.databaseCaCert, 'utf8'), rejectUnauthorized: true };
+  if (config.isProd) console.warn('[db] DATABASE_CA_CERT kosong: sertifikat Supabase tidak diverifikasi (rawan MITM).');
+  return { rejectUnauthorized: false };
+}
 
 export const pool = new pg.Pool({
   connectionString: config.databaseUrl,
-  ssl: config.databaseSsl ? { rejectUnauthorized: false } : false,
+  ssl: sslOptions(),
   max: 5,
   idleTimeoutMillis: 30_000,
+  connectionTimeoutMillis: 10_000, // gagal cepat kalau Supabase tidak bisa dihubungi
+  query_timeout: 15_000,           // jangan menunggu query selamanya
+  statement_timeout: 15_000,
 });
 pool.on('error', (e) => console.error('[db] pool error:', e.message));
 
@@ -65,7 +77,18 @@ export const listInbox = async (limit = 100) =>
   (await pool.query(`SELECT id::int, sender, name, message, ${fmt('created_at')} AS created_at FROM inbox ORDER BY id DESC LIMIT $1`,
     [limit])).rows;
 
-export const stats = async () => (await pool.query(`
+// Dashboard polling tiap 4 detik; hitungan di-cache supaya tidak full scan setiap request
+const STATS_TTL_MS = 15_000;
+let statsCache = { at: 0, value: null, pending: null };
+export async function stats() {
+  if (statsCache.value && Date.now() - statsCache.at < STATS_TTL_MS) return statsCache.value;
+  statsCache.pending ??= queryStats()
+    .then((value) => { statsCache = { at: Date.now(), value, pending: null }; return value; })
+    .finally(() => { statsCache.pending = null; });
+  return statsCache.pending;
+}
+
+const queryStats = async () => (await pool.query(`
   SELECT
     COUNT(*)::int total,
     COUNT(*) FILTER (WHERE status='sent')::int sent,

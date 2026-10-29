@@ -10,8 +10,7 @@ module.exports = {
       instances: 1,
       autorestart: true,
       max_memory_restart: '400M',
-      restart_delay: 3000,
-      exp_backoff_restart_delay: 200,
+      exp_backoff_restart_delay: 200, // jeda restart naik bertahap kalau crash berulang
       max_restarts: 20,
       min_uptime: '20s',
       kill_timeout: 10000, // beri waktu graceful shutdown (server.js paksa keluar di 8 detik)

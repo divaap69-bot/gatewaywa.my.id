@@ -29,12 +29,13 @@ const int = (name, def) => {
 export const config = {
   env: process.env.NODE_ENV || 'development',
   isProd: process.env.NODE_ENV === 'production',
-  host: process.env.HOST || '0.0.0.0',
+  host: process.env.HOST || '127.0.0.1',
   port: int('PORT', 3000),
   adminPassword: process.env.ADMIN_PASSWORD,
   apiToken: process.env.API_TOKEN,
   databaseUrl: process.env.DATABASE_URL,
   databaseSsl: process.env.DATABASE_SSL !== 'false',
+  databaseCaCert: process.env.DATABASE_CA_CERT ? path.resolve(process.env.DATABASE_CA_CERT) : '',
   authDir: path.resolve(process.env.AUTH_DIR || 'storage/auth'),
   ipWhitelist: (process.env.IP_WHITELIST || '').split(',').map((s) => s.trim()).filter(Boolean),
   webhookUrl: process.env.WEBHOOK_URL || '',
@@ -42,3 +43,8 @@ export const config = {
   delayMax: int('DELAY_MAX', 5),
   logLevel: process.env.LOG_LEVEL || 'warn',
 };
+
+if (config.databaseCaCert && !existsSync(config.databaseCaCert)) {
+  console.error(`[config] DATABASE_CA_CERT tidak ditemukan: ${config.databaseCaCert}`);
+  process.exit(1);
+}

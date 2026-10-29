@@ -14,12 +14,18 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Cek sintaks
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: for f in src/*.js; do node --check "$f"; done
+      - name: Cek sintaks
+        run: |
+          for f in src/*.js; do node --check "$f"; done
+          bash -n deploy.sh
+      - name: Pastikan host key VPS di-pin
+        env:
+          FP: ${{ secrets.VPS_FINGERPRINT }}
+        run: '[ -n "$FP" ] || { echo "Secret VPS_FINGERPRINT belum diisi (lihat DEPLOY.md)"; exit 1; }'
 
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.2.0
@@ -27,6 +33,7 @@ jobs:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
+          fingerprint: ${{ secrets.VPS_FINGERPRINT }}
           command_timeout: 8m
           script: |
             set -e
